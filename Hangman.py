@@ -60,7 +60,7 @@ def print_guessed_letters(letter):
             dashes += 1
     if dashes == 0:
         guessing_time = calculate_time(timeStart)
-        print("Awesome! You won! It took you", guessingCount, "letters and", round(guessing_time, 2), "s!")
+        print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
         gameFinished = 1
         play_again()
 
@@ -85,6 +85,7 @@ def guessing_letter():
             for i in notInWord:
                 print('%s ' % i, end='')
             print('')
+            print_hint()
             guessing_selection()
         else:
             print('Game Over!')
@@ -92,16 +93,18 @@ def guessing_letter():
 
 
 def guessing_word():
-    global lives
+    global lives, guessingCount
+    guessingCount += 1
     word = input('Enter the word: ').upper()
     if word == capital:
         guessing_time = calculate_time(timeStart)
-        print('Yaaay!! You are the winner! It took you', round(guessing_time, 2), 's!')
+        print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
         play_again()
     else:
         lives -= 2
         show_lives()
         if is_game_active():
+            print_hint()
             guessing_selection()
         else:
             print('Game Over!')
