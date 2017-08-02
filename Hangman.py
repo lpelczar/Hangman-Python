@@ -10,6 +10,7 @@ guessingCount = 0
 notInWord = []
 hint = []
 capital = ''
+state = ''
 lives = 5
 timeStart = time.time()
 
@@ -69,7 +70,7 @@ def guessing_letter():
     guessingCount += 1
     while True:
         letter = input('Enter the letter: ').upper()
-        if letter.isalpha():
+        if letter.isalpha() and len(letter) == 1:
             break
     if letter in capital:
         print_guessed_letters(letter)
@@ -111,6 +112,8 @@ def guessing_selection():
     while True:
         if gameFinished == 1:
             break
+        if lives == 1:
+            print('Hint: Capital of ' + state)
         guessing_selection = input('Do you want to guess a \033[92ml\033[0metter or a whole \033[92mw\033[0mord? ')
         if guessing_selection in letterSelection:
             guessing_letter()
@@ -141,10 +144,11 @@ def reset_values():
 
 
 def random_capital():
-    global capital
+    global capital, state
     lines = open('countries_and_capitals.txt').read().splitlines()
     state_capital = random.choice(lines).split(' | ')
     capital = state_capital[1].upper()
+    state = state_capital[0]
 
 
 def main():
