@@ -2,7 +2,6 @@ import random
 import time
 import sys
 
-capitals = ['OSLO', 'WARSAW', 'SAN MARINO']
 letterSelection = ['letter', 'LETTER', 'l']
 wordSelection = ['word', 'WORD', 'w']
 true = ['yes', 'Yes', 'YES']
@@ -10,7 +9,7 @@ gameFinished = 0
 guessingCount = 0
 notInWord = []
 hint = []
-capital = capitals[random.randint(0, len(capitals)-1)]
+capital = ''
 lives = 5
 timeStart = time.time()
 
@@ -132,18 +131,25 @@ def play_again():
 
 
 def reset_values():
-    global hint, gameFinished, guessingCount, notInWord, capital, lives, timeStart
+    global hint, notInWord,  gameFinished, guessingCount, lives, timeStart
     hint = []
     notInWord = []
     gameFinished = 0
     guessingCount = 0
-    capital = capitals[random.randint(0, len(capitals) - 1)]
     lives = 5
     timeStart = time.time()
 
 
+def random_capital():
+    global capital
+    lines = open('countries_and_capitals.txt').read().splitlines()
+    state_capital = random.choice(lines).split(' | ')
+    capital = state_capital[1].upper()
+
+
 def main():
     print('Welcome to the Hangman Game!')
+    random_capital()
     dash_word(capital)
     show_lives()
     guessing_selection()
