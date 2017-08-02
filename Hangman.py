@@ -1,6 +1,7 @@
 import random
 import time
 import sys
+from time import localtime, strftime
 
 letterSelection = ['letter', 'LETTER', 'l']
 wordSelection = ['word', 'WORD', 'w']
@@ -61,6 +62,7 @@ def print_guessed_letters(letter):
     if dashes == 0:
         guessing_time = calculate_time(timeStart)
         print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
+        add_highscore()
         gameFinished = 1
         play_again()
 
@@ -99,6 +101,7 @@ def guessing_word():
     if word == capital:
         guessing_time = calculate_time(timeStart)
         print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
+        add_highscore()
         play_again()
     else:
         lives -= 2
@@ -152,6 +155,14 @@ def random_capital():
     state_capital = random.choice(lines).split(' | ')
     capital = state_capital[1].upper()
     state = state_capital[0]
+
+
+def add_highscore():
+    name = input('Great job! Enter your name to add your score to scoreboard: ')
+    showtime = strftime("%d-%m-%Y %H:%M:%S", localtime())
+    print(showtime)
+    with open('scoreboard.txt', 'w') as f:
+        f.write(name + ' | ' + showtime + ' | ' + str(guessingCount) + ' | ' + capital)
 
 
 def main():
