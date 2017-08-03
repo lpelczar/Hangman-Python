@@ -1,6 +1,7 @@
 import random
 import time
 import sys
+import os
 from time import localtime, strftime
 
 letterSelection = ['letter', 'LETTER', 'l']
@@ -75,10 +76,14 @@ def guessing_letter():
         if letter.isalpha() and len(letter) == 1:
             break
     if letter in capital:
+        clear_terminal()
         print_guessed_letters(letter)
+        show_lives()
         guessing_selection()
     else:
         lives -= 1
+        clear_terminal()
+        print_hint()
         show_lives()
         if is_game_active():
             notInWord.append(letter)
@@ -87,7 +92,6 @@ def guessing_letter():
             for i in notInWord:
                 print('%s ' % i, end='')
             print('')
-            print_hint()
             guessing_selection()
         else:
             print('Game Over!')
@@ -105,9 +109,12 @@ def guessing_word():
         play_again()
     else:
         lives -= 2
-        show_lives()
+        if lives < 0:
+            lives = 0
         if is_game_active():
+            clear_terminal()
             print_hint()
+            show_lives()
             guessing_selection()
         else:
             print('Game Over!')
@@ -164,9 +171,13 @@ def add_highscore():
     with open('scoreboard.txt', 'w') as f:
         f.write(name + ' | ' + showtime + ' | ' + str(guessingCount) + ' | ' + capital)
 
+def clear_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print('Welcome to Hangman game! Have fun!')
+
 
 def main():
-    print('Welcome to the Hangman Game!')
+    clear_terminal()
     random_capital()
     dash_word(capital)
     show_lives()
