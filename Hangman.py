@@ -12,6 +12,7 @@ guessingCount = 0
 guessing_time = 0
 notInWord = []
 hint = []
+timeN = []
 capital = ''
 state = ''
 lives = 5
@@ -194,6 +195,13 @@ def show_highscore():
             i += 1
 
 
+def read_highscore():
+    global timeN
+    with open('scoreboard.txt', 'r') as f:
+        for line in f:
+            timeN.append(find_between(line, '> ', ' <'))
+
+
 def find_between(s, first, last):
     try:
         start = s.index(first) + len(first)
@@ -204,36 +212,40 @@ def find_between(s, first, last):
 
 
 def add_highscore():
+    read_highscore()
     name = input('Great job! Enter your name to add your score to scoreboard: ')
     showtime = strftime("%d-%m-%Y %H:%M:%S", localtime())
     round_time = str(round(guessing_time, 2))
 
-    timeN = []
-    with open('scoreboard.txt', 'r') as f:
-        for line in f:
-            timeN.append(find_between(line, '> ', ' <'))
     f = open('scoreboard.txt', 'r')
     contents = f.readlines()
     f.close()
     value = name + ' | ' + showtime + ' | ' + str(guessingCount) + ' |> ' + round_time + ' <| ' + capital+'\n'
+
     if not timeN:
         contents.insert(0, value)
         f = open('scoreboard.txt', 'w')
         contents = "".join(contents)
         f.write(contents)
         f.close()
-    elif float(round_time) < float(max(timeN)):
-        contents.insert(timeN.index(max(timeN)), value)
+
+    if float(round_time) > float(timeN[-1]):
+        contents.insert(timeN.index(timeN[-1])+1, value)
         f = open('scoreboard.txt', 'w')
         contents = "".join(contents)
         f.write(contents)
         f.close()
     else:
-        contents.insert(timeN.index(max(timeN))+2, value)
-        f = open('scoreboard.txt', 'w')
-        contents = "".join(contents)
-        f.write(contents)
-        f.close()
+        for i in timeN:
+            if float(i) > float(round_time):
+                contents.insert(timeN.index(i), value)
+                f = open('scoreboard.txt', 'w')
+                contents = "".join(contents)
+                f.write(contents)
+                f.close()
+                break
+            else:
+                continue
 
 
 def clear_terminal():
