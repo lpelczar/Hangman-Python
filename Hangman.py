@@ -208,14 +208,32 @@ def add_highscore():
     showtime = strftime("%d-%m-%Y %H:%M:%S", localtime())
     round_time = str(round(guessing_time, 2))
 
-    time = []
+    timeN = []
     with open('scoreboard.txt', 'r') as f:
         for line in f:
-            time.append(find_between(line, '> ', ' <'))
-
-    if round_time < max(time):
-        with open('scoreboard.txt', 'a') as f:
-            f.write(name + ' | ' + showtime + ' | ' + str(guessingCount) + ' |> ' + round_time + ' <| ' + capital+'\n')
+            timeN.append(find_between(line, '> ', ' <'))
+    f = open('scoreboard.txt', 'r')
+    contents = f.readlines()
+    f.close()
+    value = name + ' | ' + showtime + ' | ' + str(guessingCount) + ' |> ' + round_time + ' <| ' + capital+'\n'
+    if not timeN:
+        contents.insert(0, value)
+        f = open('scoreboard.txt', 'w')
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
+    elif float(round_time) < float(max(timeN)):
+        contents.insert(timeN.index(max(timeN)), value)
+        f = open('scoreboard.txt', 'w')
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
+    else:
+        contents.insert(timeN.index(max(timeN))+2, value)
+        f = open('scoreboard.txt', 'w')
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
 
 
 def clear_terminal():
