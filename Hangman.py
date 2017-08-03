@@ -9,6 +9,7 @@ wordSelection = ['word', 'WORD', 'w']
 true = ['yes', 'Yes', 'YES']
 gameFinished = 0
 guessingCount = 0
+guessing_time = 0
 notInWord = []
 hint = []
 capital = ''
@@ -55,7 +56,7 @@ def calculate_time(time_start):
 
 
 def print_guessed_letters(letter):
-    global gameFinished
+    global gameFinished, guessing_time
     counter = 0
     for i in capital:
         if i == letter:
@@ -116,7 +117,7 @@ def print_not_in_word():
 
 
 def guessing_word():
-    global lives, guessingCount
+    global lives, guessingCount, guessing_time
     guessingCount += 1
     word = input('Enter the word: ').upper()
     if word == capital:
@@ -184,11 +185,38 @@ def random_capital():
     state = state_capital[0]
 
 
+def show_highscore():
+    with open('scoreboard.txt', 'r') as f:
+        i = 1
+        for line in f:
+            if i >= 1 and i <= 10:
+                print(line)
+            i += 1
+
+
+def find_between(s, first, last):
+    try:
+        start = s.index(first) + len(first)
+        end = s.index(last, start)
+        return s[start:end]
+    except ValueError:
+        return ""
+
+
 def add_highscore():
     name = input('Great job! Enter your name to add your score to scoreboard: ')
     showtime = strftime("%d-%m-%Y %H:%M:%S", localtime())
-    with open('scoreboard.txt', 'w') as f:
-        f.write(name + ' | ' + showtime + ' | ' + str(guessingCount) + ' | ' + capital)
+    round_time = str(round(guessing_time, 2))
+
+    time = []
+    with open('scoreboard.txt', 'r') as f:
+        for line in f:
+            time.append(find_between(line, '> ', ' <'))
+
+    if round_time < max(time):
+        with open('scoreboard.txt', 'a') as f:
+            f.write(name + ' | ' + showtime + ' | ' + str(guessingCount) + ' |> ' + round_time + ' <| ' + capital+'\n')
+
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -222,6 +250,7 @@ def print_hangman(live):
 
 def main():
     clear_terminal()
+    show_highscore()
     random_capital()
     dash_word(capital)
     show_lives()
