@@ -32,6 +32,12 @@ def print_hint():
     print('')
 
 
+def print_spaced(word):
+    for i in word:
+        print('%s '% i, end='')
+    print('')
+
+
 def show_lives():
     print('Lives: %d' % lives)
 
@@ -62,6 +68,9 @@ def print_guessed_letters(letter):
             dashes += 1
     if dashes == 0:
         guessing_time = calculate_time(timeStart)
+        clear_terminal()
+        print_spaced(capital)
+        show_lives()
         print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
         add_highscore()
         gameFinished = 1
@@ -79,6 +88,10 @@ def guessing_letter():
         clear_terminal()
         print_guessed_letters(letter)
         show_lives()
+        print_not_in_word()
+        guessing_selection()
+    elif letter in notInWord:
+        print('You have already typed that letter!')
         guessing_selection()
     else:
         lives -= 1
@@ -87,15 +100,19 @@ def guessing_letter():
         show_lives()
         if is_game_active():
             notInWord.append(letter)
-            if notInWord:
-                print('Not in word: ', end='')
-            for i in notInWord:
-                print('%s ' % i, end='')
-            print('')
+            print_not_in_word()
             guessing_selection()
         else:
             print('Game Over!')
             play_again()
+
+
+def print_not_in_word():
+    if notInWord:
+        print('Not in word: ', end='')
+    for i in notInWord:
+        print('%s ' % i, end='')
+    print('')
 
 
 def guessing_word():
@@ -104,6 +121,9 @@ def guessing_word():
     word = input('Enter the word: ').upper()
     if word == capital:
         guessing_time = calculate_time(timeStart)
+        clear_terminal()
+        print_spaced(capital)
+        show_lives()
         print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
         add_highscore()
         play_again()
@@ -167,13 +187,37 @@ def random_capital():
 def add_highscore():
     name = input('Great job! Enter your name to add your score to scoreboard: ')
     showtime = strftime("%d-%m-%Y %H:%M:%S", localtime())
-    print(showtime)
     with open('scoreboard.txt', 'w') as f:
         f.write(name + ' | ' + showtime + ' | ' + str(guessingCount) + ' | ' + capital)
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
     print('Welcome to Hangman game! Have fun!')
+    print_hangman(lives)
+
+
+def print_ascii(start_line, end_line):
+    with open('ascii_hangman.txt', 'r') as f:
+        i = 1
+        for line in f:
+            if i >= start_line and i <= end_line:
+                print (line)
+            i += 1
+
+
+def print_hangman(live):
+    if live == 0:
+        print_ascii(2,11)
+    elif live == 1:
+        print_ascii(14,23)
+    elif live == 2:
+        print_ascii(26,35)
+    elif live == 3:
+        print_ascii(37,46)
+    elif live == 4:
+        print_ascii(48,57)
+    elif live == 5:
+        print_ascii(59,68)
 
 
 def main():
