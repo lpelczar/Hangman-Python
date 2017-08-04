@@ -4,6 +4,7 @@ import sys
 import os
 from time import localtime, strftime
 
+# Define global variables
 letterSelection = ['letter', 'LETTER', 'l']
 wordSelection = ['word', 'WORD', 'w']
 true = ['yes', 'Yes', 'YES']
@@ -20,6 +21,7 @@ timeStart = time.time()
 
 
 def dash_word(word):
+    # Display the given word which we are guessing with dashes i.e. "Warsaw" -> "_ _ _ _ _ _ "
     for i in word:
         if i == ' ':
             hint.append('  ')
@@ -29,22 +31,26 @@ def dash_word(word):
 
 
 def print_hint():
+    # Print the word in dashed format with already guessed letters
     for l in hint:
         print(l, end='')
     print('')
 
 
 def print_spaced(word):
+    # Print the given word with spaces(used to display guessed word at the end)
     for i in word:
         print('%s '% i, end='')
     print('')
 
 
 def show_lives():
+    # Print how many lives left
     print('Lives: %d' % lives)
 
 
 def is_game_active():
+    # Return true if we still have lives left and false if we don't
     if lives > 0:
         return True
     else:
@@ -52,11 +58,16 @@ def is_game_active():
 
 
 def calculate_time(time_start):
+    # Calculate time from starting the script
     time_stop = time.time()
     return time_stop - time_start
 
 
 def print_guessed_letters(letter):
+    """
+    For given letter, check if this letter exists in the guessing word, if so print every occurence
+    of this letter and check if the player already guessed the whole word
+    """
     global gameFinished, guessing_time
     counter = 0
     for i in capital:
@@ -76,10 +87,16 @@ def print_guessed_letters(letter):
         print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
         add_highscore()
         gameFinished = 1
+        show_highscore()
         play_again()
 
 
 def guessing_letter():
+    """
+    Ask user to input letter and chceck if that letter exists in guessing word and if exists in notInWord
+    (which is a list of already typed letters that don't exist in the word), if not in guessing word, the
+    player lose life
+    """
     global guessingCount, lives
     guessingCount += 1
     while True:
@@ -106,10 +123,12 @@ def guessing_letter():
             guessing_selection()
         else:
             print('Game Over!')
+            show_highscore()
             play_again()
 
 
 def print_not_in_word():
+    # Print a list of already typed letter which don't exists in guessing word
     if notInWord:
         print('Not in word: ', end='')
     for i in notInWord:
@@ -118,6 +137,10 @@ def print_not_in_word():
 
 
 def guessing_word():
+    """
+    Ask user to input the word, if word is the guessing word player wins, if not, player lose 2 lives
+    and if lives < 0, game is over
+    """
     global lives, guessingCount, guessing_time
     guessingCount += 1
     word = input('Enter the word: ').upper()
@@ -128,6 +151,7 @@ def guessing_word():
         show_lives()
         print("Awesome! You won! It took you", guessingCount, "tries and", round(guessing_time, 2), "s!")
         add_highscore()
+        show_highscore()
         play_again()
     else:
         lives -= 2
@@ -140,10 +164,14 @@ def guessing_word():
             guessing_selection()
         else:
             print('Game Over!')
+            show_highscore()
             play_again()
 
 
 def guessing_selection():
+    """
+    Ask user if he wants to guess a letter or a word and go to function which handles user choice
+    """
     while True:
         if gameFinished == 1:
             break
@@ -159,6 +187,7 @@ def guessing_selection():
 
 
 def play_again():
+    # Ask user if he wants to play again, if so reset the variables and start script again, else exit the script
     while True:
         answer = input('Type \033[92myes\033[0m to start again or any other key to quit ')
         if answer in true:
@@ -169,6 +198,7 @@ def play_again():
 
 
 def reset_values():
+    # Reset all global variables
     global hint, notInWord,  gameFinished, guessingCount, lives, timeStart
     hint = []
     notInWord = []
@@ -179,6 +209,7 @@ def reset_values():
 
 
 def random_capital():
+    # Read file with capitals, choose random pair and split string to set the capital and state to a variable
     global capital, state
     lines = open('countries_and_capitals.txt').read().splitlines()
     state_capital = random.choice(lines).split(' | ')
@@ -187,6 +218,12 @@ def random_capital():
 
 
 def show_highscore():
+    # Show highscore table to the user
+    print("Highscore table:")
+    with open('scoreboard.txt', 'r') as f:
+        data = f.read()
+        if not data:
+            print('Empty!')
     with open('scoreboard.txt', 'r') as f:
         i = 1
         for line in f:
@@ -196,6 +233,7 @@ def show_highscore():
 
 
 def read_highscore():
+    # Read the highscore table and extract the guessing time values from it
     global timeN
     with open('scoreboard.txt', 'r') as f:
         for line in f:
@@ -203,6 +241,7 @@ def read_highscore():
 
 
 def find_between(s, first, last):
+    # Find substring of a string(s) between two strings (first) and (last)
     try:
         start = s.index(first) + len(first)
         end = s.index(last, start)
@@ -212,6 +251,9 @@ def find_between(s, first, last):
 
 
 def add_highscore():
+    """
+    Ask user to enter his name, get current time then write the user score to scoreboard file
+    """
     read_highscore()
     name = input('Great job! Enter your name to add your score to scoreboard: ')
     showtime = strftime("%d-%m-%Y %H:%M:%S", localtime())
@@ -228,8 +270,7 @@ def add_highscore():
         contents = "".join(contents)
         f.write(contents)
         f.close()
-
-    if float(round_time) > float(timeN[-1]):
+    elif float(round_time) > float(timeN[-1]):
         contents.insert(timeN.index(timeN[-1])+1, value)
         f = open('scoreboard.txt', 'w')
         contents = "".join(contents)
@@ -249,12 +290,14 @@ def add_highscore():
 
 
 def clear_terminal():
+    # Clear the terminal
     os.system('cls' if os.name == 'nt' else 'clear')
     print('Welcome to Hangman game! Have fun!')
     print_hangman(lives)
 
 
 def print_ascii(start_line, end_line):
+    # Read ascii art from file
     with open('ascii_hangman.txt', 'r') as f:
         i = 1
         for line in f:
@@ -264,6 +307,7 @@ def print_ascii(start_line, end_line):
 
 
 def print_hangman(live):
+    # For given live print different ascii art
     if live == 0:
         print_ascii(2,11)
     elif live == 1:
@@ -280,7 +324,6 @@ def print_hangman(live):
 
 def main():
     clear_terminal()
-    show_highscore()
     random_capital()
     dash_word(capital)
     show_lives()
